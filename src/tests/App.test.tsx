@@ -5,6 +5,6 @@ import App from "../App";
 describe("Testing App.tsx", () => {
   it("App renders correctly", async () => {
     render(<App />);
-    expect(screen.getByText("Hello World")).toBeInTheDocument();
+    expect(screen.getByText("Pokedex!")).toBeInTheDocument();
   });
 });

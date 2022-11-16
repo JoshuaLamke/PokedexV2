@@ -4,7 +4,6 @@ module.exports = {
     'airbnb/hooks',
     'plugin:@typescript-eslint/recommended',
     'plugin:jest/recommended',
-    'plugin:prettier/recommended'
   ],
   plugins: ['react', '@typescript-eslint', 'jest', 'import'],
   env: {
@@ -24,8 +23,18 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module',
     project: './tsconfig.json',
+    extraFileExtensions: [".scss"]
   },
   rules: {
-    "@typescript-eslint/explicit-function-return-type": "warn"
+    "@typescript-eslint/quotes": [
+      "error",
+      "double",
+      {
+        "allowTemplateLiterals": true
+      }
+    ],
+    "@typescript-eslint/comma-dangle": [
+      "warn"
+    ]
   },
 };

@@ -1,12 +1,17 @@
 import React from "react";
-import { Route, Routes as RouterRoutes, BrowserRouter as Router } from "react-router-dom";
-import PageNotFound from "./PageNotFound";
+import {
+  Route,
+  Routes as RouterRoutes,
+  BrowserRouter as Router,
+} from "react-router-dom";
+import Home from "./Pages/Home";
+import PageNotFound from "./Pages/PageNotFound";
 
 const Routes: React.FC = () => {
   return (
     <Router basename="/">
       <RouterRoutes>
-        <Route index element={<h1>Hello World</h1>} />
+        <Route index element={<Home />} />
         <Route path="*" element={<PageNotFound />} />
       </RouterRoutes>
     </Router>

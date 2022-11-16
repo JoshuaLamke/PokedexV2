@@ -1,0 +1,23 @@
+$body-bg: #121212;
+$primary: #58bd7b;
+$secondary: #323234;
+* {
+  color: #ffffff;
+  
+  ::-webkit-scrollbar {
+    width: 15px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #121212;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(90, 88, 88);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #58bd7b;
+  }
+}
+@import "~bootstrap/scss/bootstrap.scss";
