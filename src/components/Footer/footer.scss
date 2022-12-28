@@ -1,0 +1,25 @@
+.navbar-link {
+  color: rgb(255, 255, 255)!important;
+}
+
+.navbar-link:hover {
+  color: rgba(255, 255, 255, 0.5)!important;
+}
+
+.footer-text {
+  font-size: clamp(0.5em, 0.5em + 2vw, 2em);
+  text-decoration: none;
+}
+
+.footer-text:hover {
+  filter: brightness(0.8);
+}
+
+.pokeapi-img {
+  width: clamp(1.5em, 1.5em + 5vw, 3em);
+  height: auto;
+}
+
+.github-img {
+  width: clamp(1em, 1em + 2vw, 5em);
+}

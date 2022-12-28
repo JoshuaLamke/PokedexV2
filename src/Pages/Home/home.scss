@@ -1,0 +1,69 @@
+#header {
+  font-size: clamp(2.5em, 1.5em + 6vw, 4em);
+}
+
+#sub-header {
+  font-size: clamp(1em, 1em + 1vw, 1.5em);
+}
+
+#home-container {
+  background: url(../../assets/cool-bg.png) no-repeat;
+  background-size: contain;
+  background-position: center;
+  height: 100vh;
+}
+
+#home-pokemon-search {
+  border: none;
+  outline: none;
+  border-bottom: 1px solid var(--bs-primary);
+  background: var(--bs-secondary);
+  font-size: 2em;
+  border-top-right-radius: .25em;
+  border-top-left-radius: .25em;
+}
+
+#search-container {
+  position: relative;
+  width: clamp(15em, 90vw, 30em);
+}
+
+#gear-icon {
+  position: absolute;
+  right: 5px;
+  cursor: pointer;
+}
+
+#modal-close {
+  cursor: pointer;
+}
+
+.modal-content {
+  background-color: var(--bs-secondary)!important;
+}
+
+#home-pokemon-search:focus {
+  background: var(--bs-secondary);
+  width: 300px;
+  font-size: 30px;
+  filter: brightness(75%);
+  transform: scale(1.05);
+  transition-duration: .5s;
+}
+
+.arrow-container {
+  -webkit-animation: mover 2s ease-in-out infinite forwards;
+  animation: mover 2s ease-in-out infinite forwards;
+}
+
+@-webkit-keyframes mover {
+  0% { transform: translateY(0px); }
+  75% { transform: translateY(10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes mover {
+  0% { transform: translateY(0px); }
+  75% { transform: translateY(10px); }
+  100% { transform: translateY(0px); }
+}

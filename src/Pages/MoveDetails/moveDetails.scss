@@ -1,0 +1,20 @@
+.move-type-image {
+  animation-name: mover;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  -webkit-animation-name: mover;
+  -webkit-animation-duration: 3s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: ease-in-out;
+  width: clamp(20vw, 15em + 5vw, 70vw);
+  height: clamp(20vw, 15em + 5vw, 70vw);
+  box-shadow: 0 0 .5em white;
+  border-radius: 50%;
+}
+
+.move-type-image:hover {
+  -webkit-animation: none;
+  animation: none;
+  transform: scale(1.03);
+}

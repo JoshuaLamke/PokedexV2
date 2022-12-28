@@ -1,0 +1,13 @@
+.crumb {
+  font-size: clamp(.75em, .75em + 2vw, 1.25em);
+  text-decoration: none;
+}
+
+.crumb:hover {
+  filter: brightness(1.25);
+}
+
+.crumb-icon {
+  height: clamp(.75em, .75em + 2vw, 1.25em);
+  width: clamp(.75em, .75em + 2vw, 1.25em);
+}

@@ -34,7 +34,8 @@ module.exports = {
       }
     ],
     "@typescript-eslint/comma-dangle": [
-      "warn"
-    ]
+      "off"
+    ],
+    "@typescript-eslint/indent": ["off"],
   },
 };
