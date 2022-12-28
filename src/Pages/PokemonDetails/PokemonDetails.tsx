@@ -1063,11 +1063,11 @@ const PokemonDetails = () => {
         {!!data.sprites.other["official-artwork"].front_default && (
           <>
             <Col xs={12}>
-              <div className="d-flex">
+              <div className="d-flex justify-content-center justify-content-sm-start">
                 <p className="lead text-center">Official Artwork</p>
               </div>
             </Col>
-            <Col xs={6} className="d-flex justify-content-center">
+            <Col xs={12} sm={6} className="d-flex justify-content-center">
               <img
                 className="official-image"
                 src={data.sprites.other["official-artwork"].front_default}
