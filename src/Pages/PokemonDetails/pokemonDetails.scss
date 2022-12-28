@@ -25,8 +25,8 @@
 .sprite-img {
   width: clamp(15vw, 10em + 2vw, 45vw);
   height: clamp(15vw, 10em + 2vw, 45vw);
-  margin-bottom: calc(-1.5em);
-  margin-top: calc(-1.5em);
+  margin-bottom: clamp(-1.75em, calc(-1vw), 0em);
+  margin-top: clamp(-1.75em, calc(-1vw), 0em);
 }
 
 .dreamworld-img {

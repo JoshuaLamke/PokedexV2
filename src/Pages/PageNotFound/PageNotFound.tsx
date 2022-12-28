@@ -15,11 +15,21 @@ const PageNotFound: React.FC = () => {
       <Button
         variant="secondary"
         className="my-2"
-        onClick={() => navigate("/")}
+        onClick={() => {
+          window.scrollTo(0, 0);
+          navigate("/");
+        }}
       >
         Homepage
       </Button>
-      <Button variant="secondary" className="my-2" onClick={() => navigate(-1)}>
+      <Button
+        variant="secondary"
+        className="my-2"
+        onClick={() => {
+          window.scrollTo(0, 0);
+          navigate(-1);
+        }}
+      >
         Previous Page
       </Button>
     </Container>

@@ -100,6 +100,7 @@ const GeneralSearch = ({}) => {
               onClick={() => {
                 setValue("");
                 setResults([]);
+                window.scrollTo(0, 0);
                 navigate(result.route, {
                   state: {
                     ...calculateCrumbs(location, {

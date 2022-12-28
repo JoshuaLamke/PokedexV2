@@ -163,7 +163,7 @@ const MoveDetails = ({}) => {
           <img
             src={getImageByType(capitalize(moveData.type.name))}
             alt={capitalize(moveData.type.name)}
-            className="mb-3 move-type-image"
+            className="my-3 move-type-image"
           />
         </Col>
         <Col
