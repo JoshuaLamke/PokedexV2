@@ -266,10 +266,16 @@ const PokemonDetails = () => {
   };
 
   const versions = [
-    ...versionResults.map((res) => res.data),
+    ...(versionResults.length && versionResults.every((v) => v.isSuccess)
+      ? versionResults.map((res) => res.data)
+      : []),
   ] as VersionDetails[];
 
-  const moves = moveResults.map((res) => res.data) as MoveDetails[];
+  const moves = [
+    ...(moveResults.length && moveResults.every((m) => m.isSuccess)
+      ? moveResults.map((res) => res.data)
+      : []),
+  ] as MoveDetails[];
 
   // Find all available move learn methods
   const moveLearnMethods = MOVE_LEARN_METHODS.reduce(

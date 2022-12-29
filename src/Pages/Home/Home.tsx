@@ -146,7 +146,9 @@ const Home: React.FC = () => {
               />
             </div>
           </section>
-          <PokemonCardContainer pokemon={filterAll([...data])} />
+          <PokemonCardContainer
+            pokemon={filterAll([...data.sort((a, b) => a.id - b.id)])}
+          />
           <Modal
             show={modalOpen}
             onHide={() => setModalOpen(false)}
