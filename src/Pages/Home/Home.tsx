@@ -33,30 +33,37 @@ const Home: React.FC = () => {
     staleTime: Infinity,
   });
 
-  const filteredPokemon = (cards: CardInfo[]) => {
+  const filterRegion = (cards: CardInfo[]) => {
     if (filters.region !== "All") {
-      cards = cards.slice(
+      return cards.slice(
         regions[filters.region][0] - 1,
         regions[filters.region][1]
       );
     }
-    if (filters.name !== "" || filters.type !== "All") {
-      cards = cards.filter((p) => {
-        const nameFilter: string = filters.name.toLowerCase().trim();
-        const typeFilter: string = filters.type;
+    return cards;
+  };
 
-        return (
-          (nameFilter === ""
-            ? true
-            : !isNaN(Number(nameFilter))
-            ? p.id.toString().includes(nameFilter)
-            : p.name.toLowerCase().includes(nameFilter)) &&
-          (typeFilter === "All"
-            ? true
-            : p.types.includes(typeFilter.toLowerCase()))
-        );
+  const filterType = (cards: CardInfo[]) => {
+    if (filters.type !== "All") {
+      const typeFilter: string = filters.type;
+      return cards.filter((p) => {
+        return p.types.includes(typeFilter.toLowerCase());
       });
     }
+    return cards;
+  };
+
+  const filterName = (cards: CardInfo[]) => {
+    if (filters.name !== "") {
+      const nameFilter: string = filters.name;
+      return cards.filter((p) => {
+        return p.name.includes(nameFilter.toLowerCase());
+      });
+    }
+    return cards;
+  };
+
+  const sortCards = (cards: CardInfo[]) => {
     return cards.sort((a, b) => {
       if (filters.sort === "numberAsc") {
         return a.id - b.id;
@@ -68,6 +75,13 @@ const Home: React.FC = () => {
         return b.name.localeCompare(a.name);
       }
     });
+  };
+
+  const filterAll = (cards: CardInfo[]) => {
+    const filteredRegion = filterRegion(cards);
+    const filteredType = filterType(filteredRegion);
+    const filteredName = filterName(filteredType);
+    return sortCards(filteredName);
   };
 
   return (
@@ -130,7 +144,7 @@ const Home: React.FC = () => {
               />
             </div>
           </section>
-          <PokemonCardContainer pokemon={filteredPokemon([...data])} />
+          <PokemonCardContainer pokemon={filterAll([...data])} />
           <Modal
             show={modalOpen}
             onHide={() => setModalOpen(false)}

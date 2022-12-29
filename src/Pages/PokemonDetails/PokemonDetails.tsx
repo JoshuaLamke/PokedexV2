@@ -33,7 +33,12 @@ import {
 import { getImageByType } from "../../utils/typeImages";
 import { typeColors } from "../../utils/typeColors";
 import BarGraph from "../../components/BarGraph/BarGraph";
-import { MoveDetails, TypeDetails, VersionDetails } from "../../types";
+import {
+  MoveDetails,
+  PokemonInfo,
+  TypeDetails,
+  VersionDetails,
+} from "../../types";
 import Switch from "react-switch";
 import { calculateCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
 import GeneralTable from "../../components/GeneralTable/GeneralTable";
@@ -47,7 +52,10 @@ const PokemonDetails = () => {
   const [gameVersion, setGameVersion] = useState<{
     version: string;
     name: string;
-  }>({ version: "None", name: pokemonName || "" });
+  }>({
+    version: "None",
+    name: pokemonName || "",
+  });
   const [moveLearnMethod, setMoveLearnMethod] = useState<string>("level-up");
   const { data, isLoading } = useQuery({
     queryKey: ["pokemon", pokemonName],
@@ -135,33 +143,56 @@ const PokemonDetails = () => {
     isLoadingSpecies ||
     isLoadingEvo ||
     !data ||
-    !speciesData ||
-    evoResults.some((result) => result.isLoading) ||
-    typeResults.some((result) => result.isLoading) ||
-    versionResults.some((result) => result.isLoading);
+    !speciesData;
 
-  const versionMoveResultsLoaded =
-    !versionResults.some((result) => result.isLoading) &&
-    !moveResults.some((result) => result.isLoading);
-  // Set versions of game available for that pokemon once info is available
+  // Set version to default when new pokemon is accessed
   useEffect(() => {
-    if (!versionMoveResultsLoaded) {
+    if (pokemonName) {
       setGameVersion({
         version: "None",
-        name: pokemonName || "",
+        name: pokemonName,
       });
-      return;
-    } else if (gameVersion.version === "None") {
+    }
+  }, [pokemonName]);
+
+  const hasMoves = (version: VersionDetails, pokemonData: PokemonInfo) => {
+    return pokemonData.moves.some((move) =>
+      move.version_group_details.some(
+        (v) => v.version_group.name === version.version_group.name
+      )
+    );
+  };
+
+  useEffect(() => {
+    if (
+      versionResults.length &&
+      versionResults.every((res) => res.isSuccess && res.data?.id) &&
+      data &&
+      gameVersion.version === "None" &&
+      pokemonName
+    ) {
       const versions = [
         ...versionResults.map((res) => res.data),
       ] as VersionDetails[];
-      const sortedVersions = versions.sort((a, b) => a.id - b.id);
+      versions.sort((a, b) => {
+        const aHasMoves = hasMoves(a, data);
+        const bHasMoves = hasMoves(b, data);
+        if (aHasMoves && !bHasMoves) {
+          return -1;
+        } else if (!aHasMoves && bHasMoves) {
+          return 1;
+        } else {
+          return a.id - b.id;
+        }
+      });
+
+      const first = versions[0];
       setGameVersion({
-        version: sortedVersions[0]?.name,
-        name: pokemonName || "",
+        name: pokemonName,
+        version: first.name,
       });
     }
-  }, [versionMoveResultsLoaded, pokemonName, gameVersion, versionResults]);
+  }, [versionResults, data, gameVersion, pokemonName]);
 
   if (everythingNotLoaded) {
     return (
@@ -315,7 +346,10 @@ const PokemonDetails = () => {
           <FormControl
             className="text-primary pokemon-details-select"
             onChange={(e) =>
-              setGameVersion({ version: e.target.value, name: pokemonName })
+              setGameVersion({
+                version: e.target.value,
+                name: pokemonName,
+              })
             }
             value={gameVersion.version}
             as="select"
@@ -907,7 +941,7 @@ const PokemonDetails = () => {
                 ],
                 bodyRows: [
                   ...movesFromGameVersion.map((move) => {
-                    const moveInfo = moves.find((m) => m.name === move.name);
+                    const moveInfo = moves.find((m) => m?.name === move.name);
                     return {
                       className: "align-middle",
                       cells: [
