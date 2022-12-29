@@ -28,6 +28,8 @@ export const fetchMoveInfo = async (moveUrl: string) => {
 export const fetchVersionInfo = async (versionUrl: string) => {
   const response = await axios.get<VersionDetails>(versionUrl);
   const data = response.data;
+  console.log(versionUrl);
+  console.log(data);
   return data;
 };
 

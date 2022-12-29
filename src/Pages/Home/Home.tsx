@@ -57,7 +57,9 @@ const Home: React.FC = () => {
     if (filters.name !== "") {
       const nameFilter: string = filters.name;
       return cards.filter((p) => {
-        return p.name.includes(nameFilter.toLowerCase());
+        return isNaN(Number(nameFilter))
+          ? p.name.includes(nameFilter.toLowerCase())
+          : p.id.toString().includes(nameFilter);
       });
     }
     return cards;

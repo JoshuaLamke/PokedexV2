@@ -158,7 +158,7 @@ const PokemonDetails = () => {
   const hasMoves = (version: VersionDetails, pokemonData: PokemonInfo) => {
     return pokemonData.moves.some((move) =>
       move.version_group_details.some(
-        (v) => v.version_group.name === version.version_group.name
+        (v) => v.version_group.name === version.version_group?.name
       )
     );
   };
@@ -166,7 +166,7 @@ const PokemonDetails = () => {
   useEffect(() => {
     if (
       versionResults.length &&
-      versionResults.every((res) => res.isSuccess && res.data?.id) &&
+      versionResults.every((res) => res.isSuccess) &&
       data &&
       gameVersion.version === "None" &&
       pokemonName

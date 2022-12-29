@@ -47,7 +47,7 @@ const MoveDetails = ({}) => {
       moveData?.flavor_text_entries.filter((f) => f.language.name === "en") ||
       []
     ).map((flavorText) => ({
-      queryKey: ["version", flavorText.version_group.name],
+      queryKey: ["version-group", flavorText.version_group.name],
       queryFn: () => fetchVersionGroupInfo(flavorText.version_group.url),
       cacheTime: Infinity,
       staleTime: Infinity,
@@ -56,19 +56,28 @@ const MoveDetails = ({}) => {
   });
 
   useEffect(() => {
-    if (moveIsLoading || versionGroupResults.some((res) => res.isLoading)) {
+    if (moveName) {
       setVersionGroup({
         versionGroup: "None",
-        moveName: moveName || "",
+        moveName: moveName,
       });
-      return;
-    } else if (versionGroup.versionGroup === "None") {
+    }
+  }, [moveName]);
+
+  useEffect(() => {
+    if (
+      moveName &&
+      versionGroup.versionGroup === "None" &&
+      !moveIsLoading &&
+      versionGroupResults.length &&
+      !versionGroupResults.some((res) => res.isLoading)
+    ) {
       const versionGroups = versionGroupResults.map(
         (res) => res.data
       ) as VersionGroupDetails[];
       setVersionGroup({
-        versionGroup: versionGroups.sort((a, b) => a.id - b.id)[0]?.name,
-        moveName: moveName || "",
+        versionGroup: versionGroups.sort((a, b) => a.id - b.id)[0].name,
+        moveName: moveName,
       });
     }
   }, [moveIsLoading, moveName, versionGroup, versionGroupResults]);
@@ -342,9 +351,9 @@ const MoveDetails = ({}) => {
                       content:
                         moveData.contest_combos?.normal?.use_before?.map(
                           (move) => (
-                            <p key={move.name}>
+                            <span key={move.name}>
                               - {capitalizeWithoutHyphens(move.name)}
-                            </p>
+                            </span>
                           )
                         ) || "N/A",
                       className: "lead",
