@@ -12,6 +12,8 @@
   cursor: pointer;
   padding: .5em;
   background: #121212;
+  position: relative;
+  z-index: 8;
 }
 
 .general-search-container:hover {
@@ -29,6 +31,8 @@
   border-top-left-radius: .25em;
   border-top-right-radius: .25em;
   width: clamp(20vw, 12em + 2vw, 90vw);
+  position: relative;
+  z-index: 5;
 }
 
 #general-pokemon-search::placeholder {
@@ -38,10 +42,12 @@
 .general-search-popover {
   width: clamp(20vw, 12em + 2vw, 90vw);
   background-color: #121212;
-  position: fixed;
-  z-index: 999;
+  position: relative;
+  z-index: 6;
 }
 
 .general-search-popover-inner {
   width: 95%;
+  position: relative;
+  z-index: 7;
 }
