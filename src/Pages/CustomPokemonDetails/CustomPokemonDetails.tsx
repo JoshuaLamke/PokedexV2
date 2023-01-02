@@ -156,7 +156,7 @@ const CustomPokemonDetails = () => {
           }}
           className="d-flex flex-column align-items-center"
         >
-          <h1 id="details-header">
+          <h1 id="details-header" className="mt-3">
             {capitalizeWithHyphens(data[pokemonName].pk)}
           </h1>
           <div className="d-flex">

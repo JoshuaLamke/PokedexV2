@@ -38,6 +38,7 @@
 .general-search-popover {
   width: clamp(20vw, 12em + 2vw, 90vw);
   background-color: #121212;
+  position: fixed;
   z-index: 999;
 }
 

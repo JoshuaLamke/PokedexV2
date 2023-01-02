@@ -398,7 +398,9 @@ const PokemonDetails = () => {
           }}
           className="d-flex flex-column align-items-center"
         >
-          <h1 id="details-header">{capitalizeWithHyphens(data.name)}</h1>
+          <h1 id="details-header" className="mt-2">
+            {capitalizeWithHyphens(data.name)}
+          </h1>
           <div className="d-flex">
             {data.types.map((type) => (
               <div

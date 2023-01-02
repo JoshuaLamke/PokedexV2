@@ -18,3 +18,7 @@
   animation: none;
   transform: scale(1.03);
 }
+
+#details-header {
+  font-size: clamp(1.5em, 1.5em + 4vw, 5em)!important;
+}
