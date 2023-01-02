@@ -30,7 +30,7 @@ module.exports = {
       "error",
       "double",
       {
-        "allowTemplateLiterals": true
+        "allowTemplateLiterals": true,
       }
     ],
     "@typescript-eslint/comma-dangle": [

@@ -1,9 +1,9 @@
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
-import { CardInfo, EvolutionDetails, GeneralPokemonInfo, MoveDetails, PokemonInfo, SpeciesDetails, Type, TypeDetails, VersionDetails, VersionGroupDetails } from "../types";
+import { CardInfo, CustomPokemon, EvolutionDetails, GeneralPokemonInfo, MoveDetails, PokemonInfo, SpeciesDetails, Type, TypeDetails, VersionDetails, VersionGroupDetails } from "../types";
 
 export const fetchAllPokemon = async () => {
-  const response = await axios.get<GeneralPokemonInfo[]>(`https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/pokemon/all`);
+  const response = await axios.get<GeneralPokemonInfo[]>("https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/pokemon/all");
   const data: CardInfo[] = response.data?.map((p) => ({
     ...p,
     types: p.types.map((t: Type) => t.type.name),
@@ -11,6 +11,18 @@ export const fetchAllPokemon = async () => {
     name: p.pk
   }));
   return data;
+};
+
+export const fetchAllCustomPokemon = async () => {
+  const response = await axios.get<Record<string, CustomPokemon>>("https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/custom/all");
+  const data = response.data; 
+  for (const key in data) {
+    data[key].image_url = `https://custom-pokemon-images.s3.amazonaws.com/${key.replace(/ /g, "+")}/${data[key].img.replace(
+      / /g,
+      "+"
+    )}`;
+  }
+  return response.data;
 };
 
 export const fetchTypeInfo = async (typeUrl: string) => {
@@ -28,8 +40,6 @@ export const fetchMoveInfo = async (moveUrl: string) => {
 export const fetchVersionInfo = async (versionUrl: string) => {
   const response = await axios.get<VersionDetails>(versionUrl);
   const data = response.data;
-  console.log(versionUrl);
-  console.log(data);
   return data;
 };
 

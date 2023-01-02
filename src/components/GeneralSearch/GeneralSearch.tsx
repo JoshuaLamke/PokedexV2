@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { typeColors } from "../../utils/typeColors";
-import { CardInfo } from "../../types";
+import { CardInfo, CustomPokemon } from "../../types";
 import { capitalize } from "lodash";
 import { getImageByType } from "../../utils/typeImages";
 import "./generalSearch.scss";
 import { capitalizeWithHyphens } from "../../utils/utils";
 import { useLocation, useNavigate } from "react-router-dom";
 import { calculateCrumbs } from "../Breadcrumb/Breadcrumbs";
-import { fetchAllPokemon } from "../../fetchData/fetch";
+import { fetchAllCustomPokemon, fetchAllPokemon } from "../../fetchData/fetch";
+import defaultImage from "../../assets/sadPokemon.png";
 
 const GeneralSearch = ({}) => {
   const navigate = useNavigate();
@@ -30,7 +31,14 @@ const GeneralSearch = ({}) => {
     staleTime: Infinity,
   });
 
-  if (!data || isLoading) {
+  const { data: customData, isLoading: isLoadingCustom } = useQuery({
+    queryKey: ["pokemon", "custom"],
+    queryFn: fetchAllCustomPokemon,
+    cacheTime: Infinity,
+    staleTime: Infinity,
+  });
+
+  if (!data || isLoading || isLoadingCustom || !customData) {
     return null;
   }
 
@@ -40,16 +48,44 @@ const GeneralSearch = ({}) => {
 
   const getFirstFiveResults = (val: string) => {
     const searchVal = val.trim().toLowerCase();
-    const matchedPokemon = data.filter((pokemon) =>
-      pokemon.name.toLowerCase().includes(searchVal)
-    );
-    const matchedTypes = types.filter((type) =>
-      type.toLowerCase().includes(searchVal)
-    );
-    const matchedResults = [...matchedPokemon, ...matchedTypes].slice(
-      undefined,
-      5
-    );
+    const isCustomPokemon = (
+      pokemon: CustomPokemon | CardInfo
+    ): pokemon is CustomPokemon => {
+      return (
+        Object.hasOwn(pokemon, "weight") && Object.hasOwn(pokemon, "inches")
+      );
+    };
+    const combinedPokemon = [...Object.values(customData), ...data, ...types];
+    const filteredPokemon = combinedPokemon
+      .filter((obj) => {
+        if (typeof obj === "string") {
+          return obj.toLowerCase().includes(searchVal);
+        } else if (isCustomPokemon(obj)) {
+          return obj.pk.toLowerCase().includes(searchVal);
+        } else {
+          return obj.name.toLowerCase().includes(searchVal);
+        }
+      })
+      .sort((a, b) => {
+        const aText =
+          typeof a === "string" ? a : isCustomPokemon(a) ? a.pk : a.name;
+        const bText =
+          typeof b === "string" ? b : isCustomPokemon(b) ? b.pk : b.name;
+        if (
+          aText.toLowerCase().startsWith(searchVal) &&
+          bText.toLowerCase().startsWith(searchVal)
+        ) {
+          return 0;
+        } else if (aText.toLowerCase().startsWith(searchVal)) {
+          return -1;
+        } else if (bText.toLowerCase().startsWith(searchVal)) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+    const matchedResults = [...filteredPokemon].slice(undefined, 5);
     setResults(
       matchedResults.map((result) => {
         if (typeof result === "string") {
@@ -59,7 +95,15 @@ const GeneralSearch = ({}) => {
             category: "type",
             route: `/types/${result.toLowerCase()}`,
           };
+        } else if (isCustomPokemon(result)) {
+          return {
+            imgSrc: result.image_url,
+            name: capitalizeWithHyphens(result.pk),
+            category: "pokemon",
+            route: `/pokemon/custom/${result.pk}`,
+          };
         }
+        console.log("in here");
         return {
           imgSrc:
             result.image ||
@@ -117,6 +161,11 @@ const GeneralSearch = ({}) => {
                   className="general-search-img me-2"
                   src={result.imgSrc}
                   alt={result.name}
+                  onError={({ currentTarget }) => {
+                    currentTarget.onerror = null;
+                    currentTarget.src = defaultImage;
+                    currentTarget.alt = "No image found.";
+                  }}
                 />
                 <span className="general-search-name">{result.name}</span>
               </div>

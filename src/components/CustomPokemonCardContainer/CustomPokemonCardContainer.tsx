@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { CardInfo } from "../../types";
-import PokemonCard from "../PokemonCard/PokemonCard";
-import "./pokemonCardContainer.scss";
-import InfiniteScroll from "react-infinite-scroller";
 import { MdCatchingPokemon } from "react-icons/md";
+import InfiniteScroll from "react-infinite-scroller";
+import { CustomPokemon } from "../../types";
+import CustomPokemonCard from "../CustomPokemonCard/CustomPokemonCard";
+import "./customPokemonCardContainer.scss";
 
 interface Props {
-  pokemon: CardInfo[];
+  cards: CustomPokemon[];
 }
 
-const PokemonCardContainer = ({ pokemon }: Props) => {
+const CustomPokemonCardContainer = ({ cards }: Props) => {
   const [numLoaded, setNumLoaded] = useState(20);
 
   useEffect(() => {
     setNumLoaded(20);
-  }, [pokemon]);
-  const allCards = pokemon.map((pInfo) => (
-    <React.Fragment key={pInfo.name}>
+  }, [cards]);
+  const allCards = cards.map((pInfo) => (
+    <React.Fragment key={pInfo.pk}>
       <Col xs={6} md={4} lg={3} className="pokemon-container-col">
-        <PokemonCard pokemonInfo={pInfo} />
+        <CustomPokemonCard pokemonInfo={pInfo} />
       </Col>
     </React.Fragment>
   ));
@@ -57,4 +57,4 @@ const PokemonCardContainer = ({ pokemon }: Props) => {
   );
 };
 
-export default PokemonCardContainer;
+export default CustomPokemonCardContainer;

@@ -1,0 +1,11 @@
+.pokemon-form {
+  min-width: 75%;
+}
+
+.form-header {
+  font-size: clamp(1.0em, 1.0em + 5vw, 4em);
+}
+
+.action-button {
+  width: clamp(0em, 6em + 4vw, 30vw);
+}

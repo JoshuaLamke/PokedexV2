@@ -1,30 +1,28 @@
-import React, { useState } from "react";
-import { CardInfo } from "../../types";
-import defaultImage from "../../assets/sadPokemon.png";
+import React from "react";
+import { CustomPokemon } from "../../types";
 import { getImageByType } from "../../utils/typeImages";
 import { capitalize, capitalizeWithHyphens, darken } from "../../utils/utils";
 import { typeColors } from "../../utils/typeColors";
-import "./pokemonCard.scss";
+import "./customPokemonCard.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import { calculateCrumbs } from "../Breadcrumb/Breadcrumbs";
 
 interface Props {
-  pokemonInfo: CardInfo;
+  pokemonInfo: CustomPokemon;
 }
 
-const PokemonCard = ({ pokemonInfo }: Props) => {
+const CustomPokemonCard = ({ pokemonInfo }: Props) => {
   const location = useLocation();
-  const [imageNotFound, setImageNotFound] = useState<boolean>(false);
   const navigate = useNavigate();
   return (
     <div
       onClick={() => {
         window.scrollTo(0, 0);
-        navigate(`/pokemon/${pokemonInfo.name}`, {
+        navigate(`/pokemon/custom/${pokemonInfo.pk}`, {
           state: calculateCrumbs(location, {
             active: false,
-            content: capitalizeWithHyphens(pokemonInfo.name),
-            to: `/pokemon/${pokemonInfo.name}`,
+            content: capitalizeWithHyphens(pokemonInfo.pk),
+            to: `/pokemon/custom/${pokemonInfo.pk}`,
           }),
         });
       }}
@@ -50,25 +48,13 @@ const PokemonCard = ({ pokemonInfo }: Props) => {
       }}
     >
       <div className="text-center">
-        <h4>{pokemonInfo.id}</h4>
-        <h5>{capitalizeWithHyphens(pokemonInfo.name)}</h5>
-        <h6 className={imageNotFound ? "" : "invisible"}>(Image Not Found)</h6>
+        <h3>{capitalizeWithHyphens(pokemonInfo.pk)}</h3>
       </div>
       <div className="d-flex justify-content-center">
         <img
           className="img-fluid card-image"
-          alt={pokemonInfo.name}
-          src={
-            pokemonInfo.image ||
-            pokemonInfo.image_url.home.front_default ||
-            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonInfo.id}.png`
-          }
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null;
-            currentTarget.src = defaultImage;
-            currentTarget.alt = "No image found.";
-            setImageNotFound(true);
-          }}
+          alt={pokemonInfo.pk}
+          src={pokemonInfo.image_url}
         />
       </div>
       <div
@@ -104,4 +90,4 @@ const PokemonCard = ({ pokemonInfo }: Props) => {
   );
 };
 
-export default PokemonCard;
+export default CustomPokemonCard;

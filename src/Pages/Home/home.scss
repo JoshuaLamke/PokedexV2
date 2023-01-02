@@ -1,12 +1,12 @@
-#header {
+.header {
   font-size: clamp(2.5em, 1.5em + 6vw, 4em);
 }
 
-#sub-header {
+.sub-header {
   font-size: clamp(1em, 1em + 1vw, 1.5em);
 }
 
-#home-container {
+.home-container {
   background: url(../../assets/cool-bg.png) no-repeat;
   background-size: contain;
   background-position: center;
@@ -54,6 +54,11 @@
 .arrow-container {
   -webkit-animation: mover 2s ease-in-out infinite forwards;
   animation: mover 2s ease-in-out infinite forwards;
+}
+
+.custom-pokemon-btn {
+  width: clamp(10em, 10em + 2vw, 90vw);
+  font-size: clamp(1em, 1em + .5vw, 1.25em);
 }
 
 @-webkit-keyframes mover {

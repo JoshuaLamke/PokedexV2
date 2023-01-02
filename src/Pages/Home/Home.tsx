@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Container, FormControl, Modal } from "react-bootstrap";
 import { fetchAllPokemon } from "../../fetchData/fetch";
 import { useQuery } from "@tanstack/react-query";
@@ -10,10 +10,25 @@ import { regions } from "../../utils/utils";
 import { CardInfo } from "../../types";
 import { AiOutlineClose } from "react-icons/ai";
 import "./home.scss";
+import { useLocation, useNavigate } from "react-router-dom";
+import { calculateCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
 
 const Home: React.FC = () => {
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState<boolean>(false);
+  useEffect(() => {
+    if (!scrolled) {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 100);
+      setTimeout(() => {
+        setScrolled(true);
+      }, 200);
+    }
+  }, [scrolled]);
   const [nameValue, setNameValue] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<{
     name: string;
     type: string;
@@ -90,14 +105,11 @@ const Home: React.FC = () => {
     <>
       <Container
         fluid
-        id="home-container"
-        className="d-flex flex-column align-items-center justify-content-between"
+        className="d-flex flex-column align-items-center justify-content-between home-container"
       >
         <header className="d-flex flex-column flex-wrap align-items-center mt-3">
-          <h1 id="header">Pokedex!</h1>
-          <h5 className="text-primary" id="sub-header">
-            By Joshua Lamke
-          </h5>
+          <h1 className="header">Pokedex!</h1>
+          <h5 className="text-primary sub-header">By Joshua Lamke</h5>
         </header>
         <div className="d-flex flex-column arrow-container mb-5">
           <GoTriangleDown
@@ -110,18 +122,14 @@ const Home: React.FC = () => {
             color={"white"}
             style={{ marginBottom: "-10px" }}
           />
-          <GoTriangleDown
-            size={30}
-            color={"white"}
-            onClick={() => setModalOpen(!modalOpen)}
-          />
+          <GoTriangleDown size={30} color={"white"} />
         </div>
       </Container>
-      {isLoading || isError ? (
+      {isLoading || isError || !data || !data.length || !scrolled ? (
         <>{"Loading"}</>
       ) : (
         <main>
-          <section className="mb-5 w-100 d-flex flex-column align-items-center">
+          <section className="mb-3 w-100 d-flex flex-column align-items-center">
             <h3 className="text-primary">Search For Pokemon</h3>
             <div id="search-container" className="d-flex align-items-center">
               <input
@@ -145,6 +153,24 @@ const Home: React.FC = () => {
                 onClick={() => setModalOpen(true)}
               />
             </div>
+            <Button
+              variant="secondary"
+              className="my-2 custom-pokemon-btn"
+              onClick={() => {
+                window.scrollTo(0, 0);
+                navigate("/custom", {
+                  state: {
+                    ...calculateCrumbs(location, {
+                      active: false,
+                      content: "Custom Pokemon",
+                      to: "/custom",
+                    }),
+                  },
+                });
+              }}
+            >
+              Custom Pokemon
+            </Button>
           </section>
           <PokemonCardContainer
             pokemon={filterAll([...data.sort((a, b) => a.id - b.id)])}

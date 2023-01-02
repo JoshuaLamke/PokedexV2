@@ -11,6 +11,8 @@
   height: clamp(20vw, 15em + 5vw, 70vw);
   box-shadow: 0 0 .5em white;
   border-radius: 50%;
+  position: relative;
+  z-index: 1;
 }
 
 .move-type-image:hover {

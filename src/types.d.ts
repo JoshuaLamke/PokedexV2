@@ -338,3 +338,38 @@ export type VersionGroupDetails = {
   regions: NameUrl[];
   versions: NameUrl[];
 };
+
+export type CustomAbility = {
+  hidden: boolean;
+  name: string;
+};
+
+export type CustomStats = {
+  hp: number;
+  def: number;
+  atk: number;
+  sp_atk: number;
+  sp_def: number;
+  speed: number;
+};
+
+export type CustomPokemon = {
+  abilities: CustomAbility[];
+  color: string;
+  stats: CustomStats;
+  types: string[];
+  weight: number;
+  shape: string;
+  lastModifiedBy: string;
+  inches: number;
+  img: string;
+  genus: string;
+  feet: number;
+  discriminator: string;
+  description: string;
+  deleted: boolean;
+  pk: string;
+  sk: string;
+  image_url: string;
+};
+

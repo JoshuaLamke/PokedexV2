@@ -6,9 +6,10 @@ import GeneralSearch from "../GeneralSearch/GeneralSearch";
 
 const Header = ({}) => {
   const location = useLocation();
+  const disallowedPaths = ["/", "/custom", "/custom/create"];
   return (
     <>
-      {location.pathname !== "/" ? (
+      {!disallowedPaths.includes(location.pathname) ? (
         <Row className="my-4">
           <Col xs={12} md={5}>
             <Breadcrumbs />
@@ -17,7 +18,13 @@ const Header = ({}) => {
             <GeneralSearch />
           </Col>
         </Row>
-      ) : null}
+      ) : (
+        <Row className="my-4">
+          <Col xs={12} md={5}>
+            <Breadcrumbs />
+          </Col>
+        </Row>
+      )}
     </>
   );
 };

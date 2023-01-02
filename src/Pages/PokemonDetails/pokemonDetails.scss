@@ -9,6 +9,8 @@
   -webkit-animation-timing-function: ease-in-out;
   width: clamp(35vw, 25em + 5vw, 90vw);
   height: clamp(35vw, 25em + 5vw, 90vw);
+  position: relative;
+  z-index: 1;
 }
 
 .pokemon-image:hover {
@@ -35,7 +37,7 @@
 }
 
 .type-container {
-  width: clamp(5em, 5em + 4vw, 10em);
+  width: clamp(5em, 5em + 8vw, 10em);
   border-radius: .4em;
   display: flex;
   align-items: center;

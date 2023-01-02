@@ -6,6 +6,9 @@ import {
 } from "react-router-dom";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
+import CreatePokemon from "./Pages/CreatePokemon/CreatePokemon";
+import CustomPokemon from "./Pages/CustomPokemon/CustomPokemon";
+import CustomPokemonDetails from "./Pages/CustomPokemonDetails/CustomPokemonDetails";
 import Home from "./Pages/Home/Home";
 import MoveDetails from "./Pages/MoveDetails/MoveDetails";
 import PageNotFound from "./Pages/PageNotFound/PageNotFound";
@@ -18,10 +21,16 @@ const Routes: React.FC = () => {
     <Router basename="/">
       <Header />
       <RouterRoutes>
-        <Route index element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/pokemon/:pokemonName" element={<PokemonDetails />} />
+        <Route
+          path="/pokemon/custom/:pokemonName"
+          element={<CustomPokemonDetails />}
+        />
         <Route path="/types/:typeName" element={<TypeDetails />} />
         <Route path="/moves/:moveName" element={<MoveDetails />} />
+        <Route path="/custom" element={<CustomPokemon />} />
+        <Route path="/custom/create" element={<CreatePokemon />} />
         <Route path="/queries/remove" element={<RemoveQueries />} />
         <Route path="*" element={<PageNotFound />} />
       </RouterRoutes>

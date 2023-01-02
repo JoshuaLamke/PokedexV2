@@ -119,6 +119,12 @@ export const kgsToLbs = (kgs: number) => {
   );
 };
 
+export const lbsToKgs = (lbs: number) => {
+  return (
+    Math.round(lbs / 2.2 * 100) / 100
+  );
+};
+
 export const mToFeetInches = (m: number) => {
   const feet = Math.floor(m * 3.28);
   const inches = Math.floor(((m * 3.28) - feet) / (1 / 12));
@@ -262,3 +268,9 @@ export const MOVE_LEARN_METHODS = [
   "form-change",
   "zygarde-cube"
 ];
+
+export const feetInchesToMeters = (feet: number, inches: number) => {
+  const inchesToMetersConversion = 0.0254;
+  const numInches = (feet * 12) + inches;
+  return Math.round((numInches * inchesToMetersConversion) * 100) / 100;
+};
