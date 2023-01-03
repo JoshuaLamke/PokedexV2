@@ -21,6 +21,7 @@ import { CustomStats, TypeDetails } from "../../types";
 import Switch from "react-switch";
 import { calculateCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
 import "./customPokemonDetails.scss";
+import { Button, ThemeProvider, createTheme } from "@mui/material";
 
 const CustomPokemonDetails = () => {
   const [checked, setChecked] = useState<boolean>(true);
@@ -50,6 +51,38 @@ const CustomPokemonDetails = () => {
     isLoading ||
     !data ||
     typeResults.some((res) => res.isLoading || !res?.data?.name);
+
+  const theme = createTheme({
+    palette: {
+      mode: "dark",
+      primary: {
+        "50": "#e7f5ec",
+        "100": "#c4e7cf",
+        "200": "#9fd7b1",
+        "300": "#77c992",
+        "400": "#58bd7b",
+        "500": "#37b165",
+        "600": "#2fa25b",
+        "700": "#26904e",
+        "800": "#1e7f43",
+        "900": "#0d5f2f",
+        main: "#58bd7b",
+      },
+      secondary: {
+        "50": "#f7f7fa",
+        "100": "#eeeef1",
+        "200": "#e2e2e5",
+        "300": "#d0d0d2",
+        "400": "#ababae",
+        "500": "#8a8a8d",
+        "600": "#636365",
+        "700": "#505052",
+        "800": "#323234",
+        "900": "#121214",
+        main: "#323234",
+      },
+    },
+  });
 
   if (everythingNotLoaded) {
     return (
@@ -309,6 +342,39 @@ const CustomPokemonDetails = () => {
               </tr>
             </tbody>
           </table>
+        </Col>
+        <Col xs={12} className="d-flex flex-column align-items-center">
+          <h3 className="text-center section-header">{`Actions`}</h3>
+          <div>
+            <ThemeProvider theme={theme}>
+              <Button
+                color="primary"
+                variant="contained"
+                className="mt-3 action-button me-2"
+                onClick={() =>
+                  navigate(`/custom/update/${pokemonName}`, {
+                    state: {
+                      ...calculateCrumbs(location, {
+                        active: false,
+                        content: `Update ${capitalizeWithHyphens(pokemonName)}`,
+                        to: `/custom/update/${pokemonName}`,
+                      }),
+                    },
+                  })
+                }
+              >
+                Edit
+              </Button>
+              <Button
+                color="secondary"
+                variant="contained"
+                className="mt-3 action-button me-2"
+                onClick={() => alert("Not implemented yet.")}
+              >
+                Delete
+              </Button>
+            </ThemeProvider>
+          </div>
         </Col>
       </Row>
     </Container>
