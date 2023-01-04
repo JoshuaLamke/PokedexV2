@@ -42,7 +42,7 @@ const CustomPokemon = ({}) => {
     queryKey: ["pokemon", "custom"],
     queryFn: fetchAllCustomPokemon,
     cacheTime: Infinity,
-    staleTime: Infinity,
+    staleTime: 5 * 60 * 1000,
   });
 
   if (isLoading || !data || !scrolled) {

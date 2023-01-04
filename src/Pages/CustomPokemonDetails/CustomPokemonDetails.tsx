@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchTypeInfo, fetchAllCustomPokemon } from "../../fetchData/fetch";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import defaultImage from "../../assets/sadPokemon.png";
 import { Col, Container, Row } from "react-bootstrap";
 import { capitalize } from "lodash";
@@ -17,17 +17,20 @@ import {
 import { getImageByType } from "../../utils/typeImages";
 import { typeColors } from "../../utils/typeColors";
 import BarGraph from "../../components/BarGraph/BarGraph";
-import { CustomStats, TypeDetails } from "../../types";
+import { CustomPokemon, CustomStats, TypeDetails } from "../../types";
 import Switch from "react-switch";
 import { calculateCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
 import "./customPokemonDetails.scss";
 import { Button, ThemeProvider, createTheme } from "@mui/material";
+import axios from "axios";
 
 const CustomPokemonDetails = () => {
   const [checked, setChecked] = useState<boolean>(true);
   const { pokemonName } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
+  const [deleting, setDeleting] = useState<boolean>(false);
   const { data, isLoading } = useQuery({
     queryKey: ["pokemon", "custom"],
     queryFn: fetchAllCustomPokemon,
@@ -37,7 +40,7 @@ const CustomPokemonDetails = () => {
   });
 
   const typeResults = useQueries({
-    queries: (data?.[pokemonName || ""].types || []).map((type) => ({
+    queries: (data?.[pokemonName || ""]?.types || []).map((type) => ({
       queryKey: [type],
       queryFn: () => fetchTypeInfo(`https://pokeapi.co/api/v2/type/${type}`),
       cacheTime: Infinity,
@@ -50,7 +53,8 @@ const CustomPokemonDetails = () => {
     !pokemonName ||
     isLoading ||
     !data ||
-    typeResults.some((res) => res.isLoading || !res?.data?.name);
+    typeResults.some((res) => res.isLoading || !res?.data?.name) ||
+    deleting;
 
   const theme = createTheme({
     palette: {
@@ -189,7 +193,7 @@ const CustomPokemonDetails = () => {
           }}
           className="d-flex flex-column align-items-center"
         >
-          <h1 id="details-header" className="mt-3">
+          <h1 id="details-header" className="mt-3 text-center">
             {capitalizeWithHyphens(data[pokemonName].pk)}
           </h1>
           <div className="d-flex">
@@ -369,7 +373,31 @@ const CustomPokemonDetails = () => {
                 color="secondary"
                 variant="contained"
                 className="mt-3 action-button me-2"
-                onClick={() => alert("Not implemented yet.")}
+                onClick={async () => {
+                  try {
+                    setDeleting(true);
+                    await axios.post(
+                      "https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/custom/delete",
+                      data[pokemonName]
+                    );
+                    const pokemonData:
+                      | Record<string, CustomPokemon>
+                      | undefined = queryClient.getQueryData([
+                      "pokemon",
+                      "custom",
+                    ]);
+                    if (pokemonData) {
+                      const { [pokemonName]: deleted, ...undeletedPokemon } =
+                        pokemonData;
+                      queryClient.setQueryData(["pokemon", "custom"], {
+                        ...undeletedPokemon,
+                      });
+                    }
+                  } catch (e) {
+                    alert(`An error occurred when deleting ${pokemonName}.`);
+                  }
+                  navigate(-1);
+                }}
               >
                 Delete
               </Button>

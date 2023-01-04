@@ -108,8 +108,10 @@ const Home: React.FC = () => {
         className="d-flex flex-column align-items-center justify-content-between home-container"
       >
         <header className="d-flex flex-column flex-wrap align-items-center mt-3">
-          <h1 className="header">Pokedex!</h1>
-          <h5 className="text-primary sub-header">By Joshua Lamke</h5>
+          <h1 className="header text-center">Pokedex!</h1>
+          <h5 className="text-primary sub-header text-center">
+            By Joshua Lamke
+          </h5>
         </header>
         <div className="d-flex flex-column arrow-container mb-5">
           <GoTriangleDown

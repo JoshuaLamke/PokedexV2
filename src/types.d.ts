@@ -371,5 +371,6 @@ export type CustomPokemon = {
   pk: string;
   sk: string;
   image_url: string;
+  image: Record<number | string, File | number>;
 };
 

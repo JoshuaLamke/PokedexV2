@@ -37,12 +37,24 @@ const EditPokemon = () => {
   const customData: Record<string, CustomPokemon> | undefined =
     queryClient.getQueryData(["pokemon", "custom"]);
   const editData = customData?.[pokemonName || ""];
+  const MAX_FILE_SIZE = 2000000;
+  const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
   const pokemonSchema = z
     .object({
       description: z.string().trim().min(10).max(300),
       ability1: z.string().trim().min(1).max(25),
       ability2: z.string().trim().min(1).max(25),
       hidden_ability: z.string().trim().min(1).max(25),
+      img: z
+        .any()
+        .refine((file) => {
+          return !file?.[0]?.size || file?.[0]?.size <= MAX_FILE_SIZE;
+        }, `Max image size is 2MB.`)
+        .refine(
+          (file) =>
+            !file?.[0]?.type || ACCEPTED_IMAGE_TYPES.includes(file?.[0]?.type),
+          "Only .jpg, .jpeg, and .png formats are supported."
+        ),
       hp: z
         .number()
         .min(1)
@@ -115,13 +127,14 @@ const EditPokemon = () => {
     setValue,
     reset,
     register,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<Schema>({
     defaultValues: {
       description: editData?.description,
       ability1: editData?.abilities.filter((a) => !a.hidden)[0].name || "",
       ability2: editData?.abilities.filter((a) => !a.hidden)[1].name || "",
       hidden_ability: editData?.abilities.filter((a) => a.hidden)[0].name || "",
+      img: {},
       hp: editData?.stats.hp,
       atk: editData?.stats.atk,
       def: editData?.stats.def,
@@ -179,6 +192,12 @@ const EditPokemon = () => {
 
   const submitPokemon = async (data: Schema) => {
     setLoading(true);
+    const formData = new FormData();
+    formData.append("file", data.img[0]);
+    formData.append("customPokemonName", editData.pk);
+    if (data.img?.length > 0) {
+      formData.append("oldImageName", editData.img);
+    }
     const formattedData = {
       stats: {
         hp: data.hp,
@@ -207,6 +226,7 @@ const EditPokemon = () => {
       weight: data.pounds,
       feet: data.feet,
       inches: data.inches,
+      img: data.img?.[0]?.name || editData.img,
       genus: data.genus,
       shape: data.shape,
       color: data.color,
@@ -218,6 +238,16 @@ const EditPokemon = () => {
         "https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/custom/update",
         formattedData
       );
+      if (data.img?.length > 0) {
+        await axios.post(
+          "https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/custom/updateImg",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+      }
+
       const { name, originalData, ...rest } = formattedData;
       const currData: Record<string, CustomPokemon> | undefined =
         queryClient.getQueryData(["pokemon", "custom"]);
@@ -230,6 +260,10 @@ const EditPokemon = () => {
           sk: "custom-pokemon",
           deleted: false,
           lastModifiedBy: "pokemon-service",
+          image_url: `https://custom-pokemon-images.s3.amazonaws.com/${name.replace(
+            / /g,
+            "+"
+          )}/${rest.img.replace(/ /g, "+")}`,
         },
       });
       navigate("/custom", {
@@ -488,6 +522,17 @@ const EditPokemon = () => {
                   helperText={errors.color?.message}
                 />
               </Col>
+              <h3>Upload Image</h3>
+              <Col xs={12}>
+                <TextField
+                  {...register("img")}
+                  variant="outlined"
+                  type="file"
+                  fullWidth
+                  error={errors.img !== undefined}
+                  helperText={errors.img?.message as string | undefined}
+                />
+              </Col>
             </Row>
             <div className="w-100 d-flex justify-content-end">
               <Button
@@ -504,7 +549,7 @@ const EditPokemon = () => {
                 className="mt-3 action-button"
                 type="submit"
                 variant="contained"
-                disabled={loading}
+                disabled={loading || !isDirty}
               >
                 Submit
               </Button>
