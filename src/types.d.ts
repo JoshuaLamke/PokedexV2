@@ -372,5 +372,6 @@ export type CustomPokemon = {
   sk: string;
   image_url: string;
   image: Record<number | string, File | number>;
+  password: string;
 };
 

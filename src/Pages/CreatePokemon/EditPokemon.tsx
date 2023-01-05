@@ -268,7 +268,14 @@ const EditPokemon = () => {
       });
       navigate("/custom", {
         state: {
-          crumbs: removeCrumbs(location, 1),
+          crumbs: [
+            ...removeCrumbs(location, 3),
+            {
+              to: "/custom",
+              active: false,
+              content: "Custom Pokemon",
+            },
+          ],
         },
       });
     } catch (e) {

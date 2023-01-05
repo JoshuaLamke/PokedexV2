@@ -103,7 +103,6 @@ const GeneralSearch = ({}) => {
             route: `/pokemon/custom/${result.pk}`,
           };
         }
-        console.log("in here");
         return {
           imgSrc:
             result.image ||

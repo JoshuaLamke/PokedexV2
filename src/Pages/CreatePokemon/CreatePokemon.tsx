@@ -17,6 +17,8 @@ import {
   FormHelperText,
   Box,
   Chip,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import "./createPokemon.scss";
 import { typeColors } from "../../utils/typeColors";
@@ -27,11 +29,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { removeCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
 import { useQueryClient } from "@tanstack/react-query";
 import { CustomPokemon } from "../../types";
+import cryptojs from "crypto-js";
+import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 
 const CreatePokemon = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const queryClient = useQueryClient();
   const MAX_FILE_SIZE = 2000000;
   const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
@@ -111,10 +118,16 @@ const CreatePokemon = () => {
       genus: z.string().trim().min(1).max(15),
       shape: z.string().trim().min(1).max(15),
       color: z.string().trim().min(1).max(15),
+      password: z.string().trim().min(8).max(15),
+      confirm_password: z.string().trim().min(8).max(15),
     })
     .refine((data) => !(data.feet === 0 && data.inches === 0), {
       message: "Must specify height value for feet or inches.",
       path: ["feet"],
+    })
+    .refine((data) => data.password === data.confirm_password, {
+      message: "Passwords must be the same",
+      path: ["confirm_password"],
     });
 
   type Schema = z.infer<typeof pokemonSchema>;
@@ -146,6 +159,8 @@ const CreatePokemon = () => {
       genus: "",
       shape: "",
       color: "",
+      password: "",
+      confirm_password: "",
     },
     resolver: zodResolver(pokemonSchema),
   });
@@ -220,6 +235,7 @@ const CreatePokemon = () => {
       shape: data.shape,
       color: data.color,
       types: data.types,
+      password: cryptojs.SHA256(data.password).toString(cryptojs.enc.Base64),
       originalData: data,
     };
     try {
@@ -526,6 +542,65 @@ const CreatePokemon = () => {
                   fullWidth
                   error={errors.img !== undefined}
                   helperText={errors.img?.message as string | undefined}
+                />
+              </Col>
+              <h3>Edit/Delete Password</h3>
+              <Col xs={12} sm={6}>
+                <TextField
+                  {...register("password")}
+                  variant="outlined"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  error={errors.password !== undefined}
+                  helperText={errors.password?.message}
+                  label={"Password"}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        style={{ width: "2em" }}
+                      >
+                        {showPassword ? (
+                          <AiFillEye size={20} />
+                        ) : (
+                          <AiFillEyeInvisible size={20} />
+                        )}
+                      </IconButton>
+                    ),
+                  }}
+                />
+              </Col>
+              <Col xs={12} sm={6}>
+                <TextField
+                  {...register("confirm_password")}
+                  variant="outlined"
+                  type={showConfirmPassword ? "text" : "password"}
+                  fullWidth
+                  error={errors.confirm_password !== undefined}
+                  helperText={errors.confirm_password?.message}
+                  label="Confirm Password"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          edge="end"
+                          style={{ width: "2em" }}
+                        >
+                          {showConfirmPassword ? (
+                            <AiFillEye size={20} />
+                          ) : (
+                            <AiFillEyeInvisible size={20} />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Col>
             </Row>

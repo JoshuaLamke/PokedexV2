@@ -58,7 +58,7 @@ const CustomPokemonCard = ({ pokemonInfo }: Props) => {
         />
       </div>
       <div
-        className="d-flex justify-content-center align-items-center"
+        className="d-flex justify-content-center align-items-end"
         style={{ height: "100%" }}
       >
         {pokemonInfo.types.map((type) => {

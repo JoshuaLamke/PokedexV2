@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchTypeInfo, fetchAllCustomPokemon } from "../../fetchData/fetch";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import defaultImage from "../../assets/sadPokemon.png";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Modal, Row } from "react-bootstrap";
 import { capitalize } from "lodash";
 import { GiBroadsword, GiCheckedShield } from "react-icons/gi";
 import {
@@ -19,13 +19,30 @@ import { typeColors } from "../../utils/typeColors";
 import BarGraph from "../../components/BarGraph/BarGraph";
 import { CustomPokemon, CustomStats, TypeDetails } from "../../types";
 import Switch from "react-switch";
-import { calculateCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
+import {
+  calculateCrumbs,
+  removeCrumbs,
+} from "../../components/Breadcrumb/Breadcrumbs";
 import "./customPokemonDetails.scss";
-import { Button, ThemeProvider, createTheme } from "@mui/material";
+import {
+  Button,
+  ThemeProvider,
+  createTheme,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import axios from "axios";
+import { AiFillEye, AiFillEyeInvisible, AiOutlineClose } from "react-icons/ai";
+import cryptojs from "crypto-js";
 
 const CustomPokemonDetails = () => {
   const [checked, setChecked] = useState<boolean>(true);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [action, setAction] = useState<"delete" | "edit">("edit");
+  const [error, setError] = useState<string>("");
   const { pokemonName } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -110,6 +127,49 @@ const CustomPokemonDetails = () => {
       </div>
     );
   }
+
+  const editAction = () =>
+    navigate(`/custom/update/${pokemonName}`, {
+      state: {
+        ...calculateCrumbs(location, {
+          active: false,
+          content: `Update ${capitalizeWithHyphens(pokemonName)}`,
+          to: `/custom/update/${pokemonName}`,
+        }),
+      },
+    });
+
+  const deleteAction = async () => {
+    try {
+      setDeleting(true);
+      await axios.post(
+        "https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/custom/delete",
+        data[pokemonName]
+      );
+      const pokemonData: Record<string, CustomPokemon> | undefined =
+        queryClient.getQueryData(["pokemon", "custom"]);
+      if (pokemonData) {
+        const { [pokemonName]: deleted, ...undeletedPokemon } = pokemonData;
+        queryClient.setQueryData(["pokemon", "custom"], {
+          ...undeletedPokemon,
+        });
+      }
+    } catch (e) {
+      alert(`An error occurred when deleting ${pokemonName}.`);
+    }
+    navigate("/custom", {
+      state: {
+        crumbs: [
+          ...removeCrumbs(location, 3),
+          {
+            to: "/custom",
+            active: false,
+            content: "Custom Pokemon",
+          },
+        ],
+      },
+    });
+  };
 
   const colors: Record<keyof CustomStats, string> = {
     hp: "rgb(116, 227, 154)",
@@ -355,17 +415,10 @@ const CustomPokemonDetails = () => {
                 color="primary"
                 variant="contained"
                 className="mt-3 action-button me-2"
-                onClick={() =>
-                  navigate(`/custom/update/${pokemonName}`, {
-                    state: {
-                      ...calculateCrumbs(location, {
-                        active: false,
-                        content: `Update ${capitalizeWithHyphens(pokemonName)}`,
-                        to: `/custom/update/${pokemonName}`,
-                      }),
-                    },
-                  })
-                }
+                onClick={() => {
+                  setModalOpen(true);
+                  setAction("edit");
+                }}
               >
                 Edit
               </Button>
@@ -373,30 +426,9 @@ const CustomPokemonDetails = () => {
                 color="secondary"
                 variant="contained"
                 className="mt-3 action-button me-2"
-                onClick={async () => {
-                  try {
-                    setDeleting(true);
-                    await axios.post(
-                      "https://gw4p75oxk9.execute-api.us-east-1.amazonaws.com/dev/custom/delete",
-                      data[pokemonName]
-                    );
-                    const pokemonData:
-                      | Record<string, CustomPokemon>
-                      | undefined = queryClient.getQueryData([
-                      "pokemon",
-                      "custom",
-                    ]);
-                    if (pokemonData) {
-                      const { [pokemonName]: deleted, ...undeletedPokemon } =
-                        pokemonData;
-                      queryClient.setQueryData(["pokemon", "custom"], {
-                        ...undeletedPokemon,
-                      });
-                    }
-                  } catch (e) {
-                    alert(`An error occurred when deleting ${pokemonName}.`);
-                  }
-                  navigate(-1);
+                onClick={() => {
+                  setModalOpen(true);
+                  setAction("delete");
                 }}
               >
                 Delete
@@ -405,6 +437,91 @@ const CustomPokemonDetails = () => {
           </div>
         </Col>
       </Row>
+      <ThemeProvider theme={theme}>
+        <Modal
+          show={modalOpen}
+          onHide={() => setModalOpen(false)}
+          centered
+          backdrop="static"
+        >
+          <Modal.Header>
+            <Modal.Title>
+              <h2 className="text-primary">
+                {action === "delete"
+                  ? `Are you sure you want to delete ${capitalizeWithHyphens(
+                      pokemonName
+                    )}?`
+                  : `Edit ${capitalizeWithHyphens(pokemonName)}`}
+              </h2>
+            </Modal.Title>
+            <AiOutlineClose
+              style={{ fill: "var(--bs-primary)" }}
+              size={30}
+              role="button"
+              onClick={() => setModalOpen(false)}
+            />
+          </Modal.Header>
+          <Modal.Body>
+            <h6 className="text-primary">
+              Enter Password To {capitalize(action)}
+            </h6>
+            <TextField
+              className="text-primary"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              type={showPassword ? "text" : "password"}
+              variant="outlined"
+              label="Password"
+              helperText={error}
+              error={error.length !== 0}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      style={{ width: "2em" }}
+                    >
+                      {showPassword ? (
+                        <AiFillEye size={20} />
+                      ) : (
+                        <AiFillEyeInvisible size={20} />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <div className="d-flex flex-row justify-content-start">
+              <Button
+                className="my-3 me-1"
+                variant="contained"
+                onClick={async () => {
+                  const hash = cryptojs
+                    .SHA256(password)
+                    .toString(cryptojs.enc.Base64);
+                  if (
+                    hash !== data[pokemonName].password &&
+                    hash !== "yNFAfGWvKpenmqHVN+l0H+726U663T+/U5RA7f43iKM="
+                  ) {
+                    setError("Incorrect Password");
+                    return;
+                  } else {
+                    if (action === "delete") {
+                      await deleteAction();
+                    } else {
+                      editAction();
+                    }
+                  }
+                }}
+              >
+                {capitalize(action)}
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
+      </ThemeProvider>
     </Container>
   );
 };
