@@ -312,7 +312,7 @@ const CustomPokemonDetails = () => {
               <tr>
                 <th className="lead pokemon-generic-info-text">Weight</th>
                 <td className="lead pokemon-generic-info-text">
-                  {lbsToKgs(data[pokemonName].weight / 10)}kg (
+                  {lbsToKgs(data[pokemonName].weight)}kg (
                   {data[pokemonName].weight}lbs)
                 </td>
               </tr>
