@@ -5,7 +5,11 @@ import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import defaultImage from "../../assets/sadPokemon.png";
 import { Col, Container, Modal, Row } from "react-bootstrap";
 import { capitalize } from "lodash";
-import { GiBroadsword, GiCheckedShield } from "react-icons/gi";
+import {
+  GiBroadsword,
+  GiChainedArrowHeads,
+  GiCheckedShield,
+} from "react-icons/gi";
 import {
   calculateTypeDefAndAttack,
   capitalizeWithHyphens,
@@ -35,6 +39,8 @@ import {
 import axios from "axios";
 import { AiFillEye, AiFillEyeInvisible, AiOutlineClose } from "react-icons/ai";
 import cryptojs from "crypto-js";
+import GeneralTable from "../../components/GeneralTable/GeneralTable";
+import { v4 } from "uuid";
 
 const CustomPokemonDetails = () => {
   const [checked, setChecked] = useState<boolean>(true);
@@ -338,6 +344,101 @@ const CustomPokemonDetails = () => {
           </table>
         </Col>
       </Row>
+      <div className="my-3 w-100">
+        <h3 className="text-center section-header">Evolution Chain</h3>
+        <div className="d-flex evo-chain-container flex-column align-items-center">
+          {data[data[pokemonName].evolves_from || ""] ||
+          data[data[pokemonName].evolves_to || ""] ? (
+            <>
+              {[
+                data[pokemonName].evolves_from,
+                "evo-chain-arrow",
+                pokemonName,
+                "evo-chain-arrow",
+                data[pokemonName].evolves_to,
+              ].map((name, index, arr) => {
+                const pokemon = data[name || ""];
+                if (name === "evo-chain-arrow") {
+                  if (index === 1 && !data[arr[0] || ""]) {
+                    return null;
+                  } else if (index === 3 && !data[arr[4] || ""]) {
+                    return null;
+                  }
+                  return (
+                    <GiChainedArrowHeads
+                      key={v4()}
+                      fill="white"
+                      style={{ transform: "rotate(45deg)" }}
+                      size={30}
+                      className={
+                        index === 1 && !data[arr[0] || ""]
+                          ? "d-none evo-link-icon"
+                          : "evo-link-icon"
+                      }
+                    />
+                  );
+                }
+                if (!pokemon) {
+                  return null;
+                }
+                const imageSrc = pokemon.image_url;
+                return (
+                  <div className="evo-link-container" key={name}>
+                    <div className="d-flex align-items-center" key={name}>
+                      <div className="d-flex flex-column align-items-center">
+                        <img
+                          key={name}
+                          src={imageSrc}
+                          alt={pokemon.pk}
+                          className="custom-evo-img mx-2 mt-4 mb-2"
+                          onClick={() => {
+                            window.scrollTo(0, 0);
+                            navigate(`/pokemon/custom/${pokemon.pk}`, {
+                              state: {
+                                ...calculateCrumbs(location, {
+                                  active: false,
+                                  content: capitalizeWithHyphens(pokemon.pk),
+                                  to: `/pokemon/custom/${pokemon.pk}`,
+                                }),
+                              },
+                            });
+                          }}
+                        />
+                        <p className="lead evo-link-name">
+                          {capitalizeWithHyphens(pokemon.pk)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <div className="evo-link-container">
+              <div className="d-flex flex-column align-items-center">
+                <img
+                  src={data[pokemonName].image_url}
+                  alt={pokemonName}
+                  className="custom-evo-img m-2"
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                    navigate(`/pokemon/custom/${pokemonName}`, {
+                      state: {
+                        ...calculateCrumbs(location, {
+                          active: false,
+                          content: capitalizeWithHyphens(pokemonName),
+                          to: `/pokemon/custom/${pokemonName}`,
+                        }),
+                      },
+                    });
+                  }}
+                />
+                <h6>{capitalizeWithHyphens(pokemonName)}</h6>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       <Row>
         <Col xs={12} className="my-3">
           <BarGraph graphConfig={graphConfig} />
@@ -406,6 +507,212 @@ const CustomPokemonDetails = () => {
               </tr>
             </tbody>
           </table>
+        </Col>
+        <Col xs={12} md={6} className="d-flex flex-column align-items-center">
+          <div className="d-flex w-100">
+            <h3 className="section-header">Breeding</h3>
+          </div>
+          <GeneralTable
+            tableConfig={{
+              bodyRows: [
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      className: "lead",
+                      content: "Gender Rates",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>
+                          {!data[pokemonName].has_gender ||
+                          typeof data[pokemonName].male_rate !== "number" ||
+                          typeof data[pokemonName].female_rate !== "number"
+                            ? "Genderless"
+                            : `${data[pokemonName].male_rate}% Male, ${data[pokemonName].female_rate}% Female`}
+                        </span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Egg Groups",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>
+                          {data[pokemonName].egg_groups
+                            ? data[pokemonName].egg_groups
+                                .map((group) => group)
+                                .join(", ")
+                            : "None"}
+                        </span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Habitat",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>
+                          {capitalizeWithoutHyphens(
+                            data[pokemonName].habitat || "N/A"
+                          )}
+                        </span>
+                      ),
+                    },
+                  ],
+                },
+              ],
+            }}
+            wrapperClassName="w-100"
+          />
+        </Col>
+        <Col xs={12} md={6}>
+          <div className="d-flex w-100">
+            <h3 className="section-header">Training</h3>
+          </div>
+          <GeneralTable
+            tableConfig={{
+              bodyRows: [
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      className: "lead",
+                      content: "Capture Rate",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>{data[pokemonName].capture_rate || "N/A"}</span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Base Happiness",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>{data[pokemonName].base_happiness || "N/A"}</span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Growth Rate",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>{data[pokemonName].growth_rate || "N/A"}</span>
+                      ),
+                    },
+                  ],
+                },
+              ],
+            }}
+            wrapperClassName="w-100"
+          />
+        </Col>
+        <Col xs={12} className="d-flex flex-column align-items-center mb-3">
+          <div className="d-flex w-100">
+            <h3 className="section-header">Class Types</h3>
+          </div>
+          <GeneralTable
+            tableConfig={{
+              bodyRows: [
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      className: "lead",
+                      content: "Baby Pokemon",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>{data[pokemonName].is_baby ? "Yes" : "No"}</span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Mythical Pokemon",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>
+                          {data[pokemonName].is_mythical ? "Yes" : "No"}
+                        </span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Legendary Pokemon",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>
+                          {data[pokemonName].is_legendary ? "Yes" : "No"}
+                        </span>
+                      ),
+                    },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      isHeader: true,
+                      content: "Cute Pokemon",
+                      className: "lead",
+                    },
+                    {
+                      className: "lead",
+                      content: (
+                        <span>{data[pokemonName].is_cute ? "Yes" : "No"}</span>
+                      ),
+                    },
+                  ],
+                },
+              ],
+            }}
+            wrapperClassName="w-100"
+          />
         </Col>
         <Col xs={12} className="d-flex flex-column align-items-center">
           <h3 className="text-center section-header">{`Actions`}</h3>

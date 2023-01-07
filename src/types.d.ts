@@ -373,5 +373,20 @@ export type CustomPokemon = {
   image_url: string;
   image: Record<number | string, File | number>;
   password: string;
+  evolves_from: string | undefined,
+  evolves_to: string | undefined,
+  has_gender: boolean | undefined,
+  has_gender_differences: boolean | undefined,
+  female_rate: number | undefined,
+  male_rate: number | undefined,
+  egg_groups: string[],
+  habitat: string | undefined,
+  capture_rate: number | undefined,
+  base_happiness: number | undefined,
+  growth_rate: string | undefined,
+  is_baby: boolean | undefined,
+  is_legendary: boolean | undefined,
+  is_mythical: boolean | undefined,
+  is_cute: boolean | undefined,
 };
 

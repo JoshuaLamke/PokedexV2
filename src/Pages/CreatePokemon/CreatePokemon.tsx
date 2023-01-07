@@ -19,11 +19,13 @@ import {
   Chip,
   InputAdornment,
   IconButton,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import "./createPokemon.scss";
 import { typeColors } from "../../utils/typeColors";
 import { isArray } from "lodash";
-import { capitalize } from "../../utils/utils";
+import { capitalize, eggGroups, growthRates } from "../../utils/utils";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { removeCrumbs } from "../../components/Breadcrumb/Breadcrumbs";
@@ -120,6 +122,21 @@ const CreatePokemon = () => {
       color: z.string().trim().min(1).max(15),
       password: z.string().trim().min(8).max(15),
       confirm_password: z.string().trim().min(8).max(15),
+      evolves_from: z.string().trim().optional(),
+      evolves_to: z.string().trim().optional(),
+      has_gender: z.boolean().optional(),
+      has_gender_differences: z.boolean().optional(),
+      female_rate: z.number().optional(),
+      male_rate: z.number().optional(),
+      egg_groups: z.array(z.string()).optional(),
+      habitat: z.string().trim().optional(),
+      capture_rate: z.number().optional(),
+      base_happiness: z.number().optional(),
+      growth_rate: z.string().optional(),
+      is_baby: z.boolean().optional(),
+      is_legendary: z.boolean().optional(),
+      is_mythical: z.boolean().optional(),
+      is_cute: z.boolean().optional(),
     })
     .refine((data) => !(data.feet === 0 && data.inches === 0), {
       message: "Must specify height value for feet or inches.",
@@ -236,6 +253,21 @@ const CreatePokemon = () => {
       color: data.color,
       types: data.types,
       password: cryptojs.SHA256(data.password).toString(cryptojs.enc.Base64),
+      base_happiness: data.base_happiness,
+      capture_rate: data.capture_rate,
+      egg_groups: data.egg_groups,
+      evolves_from: data.evolves_from,
+      evolves_to: data.evolves_to,
+      female_rate: data.female_rate,
+      growth_rate: data.growth_rate,
+      habitat: data.habitat,
+      has_gender: data.has_gender,
+      has_gender_differences: data.has_gender_differences,
+      is_baby: data.is_baby,
+      is_cute: data.is_cute,
+      is_legendary: data.is_legendary,
+      is_mythical: data.is_mythical,
+      male_rate: data.male_rate,
       originalData: data,
     };
     try {
@@ -279,6 +311,7 @@ const CreatePokemon = () => {
   };
 
   const typeError = errors.types as FieldError | undefined;
+  const eggGroupError = errors.egg_groups as FieldError | undefined;
   return (
     <Container className="d-flex flex-column align-items-center">
       <h1 className="form-header text-center mt-3">Create Pokemon</h1>
@@ -290,7 +323,7 @@ const CreatePokemon = () => {
         >
           <FormGroup>
             <Row className="g-3 d-flex">
-              <h3>Basic Info</h3>
+              <h5>Basic Info</h5>
               <Col xs={12}>
                 <TextField
                   {...register("name")}
@@ -402,7 +435,7 @@ const CreatePokemon = () => {
                   helperText={errors.hidden_ability?.message}
                 />
               </Col>
-              <h3>Stats</h3>
+              <h5>Stats</h5>
               <Col xs={12} sm={4}>
                 <TextField
                   {...register("hp", { valueAsNumber: true })}
@@ -469,7 +502,7 @@ const CreatePokemon = () => {
                   helperText={errors.speed?.message}
                 />
               </Col>
-              <h3>Identifying Info</h3>
+              <h5>Identifying Info</h5>
               <Col xs={12} sm={4}>
                 <TextField
                   {...register("feet", { valueAsNumber: true })}
@@ -533,7 +566,7 @@ const CreatePokemon = () => {
                   helperText={errors.color?.message}
                 />
               </Col>
-              <h3>Upload Image</h3>
+              <h5>Image</h5>
               <Col xs={12}>
                 <TextField
                   {...register("img")}
@@ -544,7 +577,7 @@ const CreatePokemon = () => {
                   helperText={errors.img?.message as string | undefined}
                 />
               </Col>
-              <h3>Edit/Delete Password</h3>
+              <h5>Edit/Delete Password</h5>
               <Col xs={12} sm={6}>
                 <TextField
                   {...register("password")}
@@ -601,6 +634,306 @@ const CreatePokemon = () => {
                       </InputAdornment>
                     ),
                   }}
+                />
+              </Col>
+              <h1 className="text-center">Optional Info</h1>
+              <h5>Evolution Info</h5>
+              <Col xs={12} sm={6}>
+                <TextField
+                  {...register("evolves_from")}
+                  label="Evolves From"
+                  variant="outlined"
+                  fullWidth
+                  error={errors.evolves_from !== undefined}
+                  helperText={errors.evolves_from?.message}
+                />
+              </Col>
+              <Col xs={12} sm={6}>
+                <TextField
+                  {...register("evolves_to")}
+                  label="Evolves To"
+                  variant="outlined"
+                  fullWidth
+                  error={errors.evolves_to !== undefined}
+                  helperText={errors.evolves_to?.message}
+                />
+              </Col>
+              <h5>Breeding</h5>
+              <Col xs={12} sm={6} className="d-flex align-items-center">
+                <FormControlLabel
+                  control={
+                    <Controller
+                      name={"has_gender"}
+                      control={control}
+                      render={({ field: props }) => (
+                        <Checkbox
+                          {...props}
+                          checked={!!props.value || false}
+                          onChange={(e) => props.onChange(e.target.checked)}
+                        />
+                      )}
+                    />
+                  }
+                  label={"Has Gender?"}
+                  labelPlacement="start"
+                />
+              </Col>
+              <Col xs={12} sm={6} className="d-flex align-items-center">
+                <FormControlLabel
+                  control={
+                    <Controller
+                      name={"has_gender_differences"}
+                      control={control}
+                      render={({ field: props }) => (
+                        <Checkbox
+                          {...props}
+                          checked={!!props.value || false}
+                          onChange={(e) => props.onChange(e.target.checked)}
+                        />
+                      )}
+                    />
+                  }
+                  label={"Gender Differences?"}
+                  labelPlacement="start"
+                />
+              </Col>
+              <Col xs={12} sm={6}>
+                <TextField
+                  {...register("male_rate", { valueAsNumber: true })}
+                  label="Male Gender Rate"
+                  variant="outlined"
+                  fullWidth
+                  type="number"
+                  error={errors.male_rate !== undefined}
+                  helperText={errors.male_rate?.message}
+                />
+              </Col>
+              <Col xs={12} sm={6}>
+                <TextField
+                  {...register("female_rate", { valueAsNumber: true })}
+                  label="Female Gender Rate"
+                  variant="outlined"
+                  fullWidth
+                  type="number"
+                  error={errors.female_rate !== undefined}
+                  helperText={errors.female_rate?.message}
+                />
+              </Col>
+              <Col xs={12} sm={6} md={4} lg={3}>
+                <Controller
+                  render={({ field: { value, onChange } }) => (
+                    <FormControl sx={{ width: "100%" }}>
+                      <InputLabel
+                        id="egg-group-select-label"
+                        error={eggGroupError !== undefined}
+                      >
+                        Egg Group(s)
+                      </InputLabel>
+                      <Select
+                        value={value || []}
+                        onChange={(e) => {
+                          onChange(e);
+                          if (
+                            isArray(e.target.value) &&
+                            e.target.value.length > 2
+                          ) {
+                            setValue("egg_groups", e.target.value.slice(1));
+                          }
+                        }}
+                        labelId="egg-group-select-label"
+                        input={<OutlinedInput label="Egg Group(s)" />}
+                        multiple
+                        variant="outlined"
+                        fullWidth
+                        error={eggGroupError !== undefined}
+                        renderValue={(egg_groups) => (
+                          <Box
+                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                          >
+                            {egg_groups.map((val) => (
+                              <Chip
+                                color="secondary"
+                                key={val}
+                                label={capitalize(val)}
+                              />
+                            ))}
+                          </Box>
+                        )}
+                      >
+                        {eggGroups.map((group) => (
+                          <MenuItem key={group.value} value={group.value}>
+                            {group.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {eggGroupError && (
+                        <FormHelperText error>
+                          {eggGroupError.message}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                  name="egg_groups"
+                  control={control}
+                />
+              </Col>
+              <h5>Training</h5>
+              <Col xs={12} sm={4}>
+                <TextField
+                  {...register("habitat")}
+                  label="Habitat"
+                  variant="outlined"
+                  fullWidth
+                  error={errors.habitat !== undefined}
+                  helperText={errors.habitat?.message}
+                />
+              </Col>
+              <Col xs={12} sm={4}>
+                <TextField
+                  {...register("capture_rate", { valueAsNumber: true })}
+                  label="Capture Rate"
+                  variant="outlined"
+                  fullWidth
+                  type="number"
+                  error={errors.capture_rate !== undefined}
+                  helperText={errors.capture_rate?.message}
+                />
+              </Col>
+              <Col xs={12} sm={4}>
+                <TextField
+                  {...register("base_happiness", { valueAsNumber: true })}
+                  label="Base Happiness"
+                  variant="outlined"
+                  type="number"
+                  fullWidth
+                  error={errors.base_happiness !== undefined}
+                  helperText={errors.base_happiness?.message}
+                />
+              </Col>
+              <Col xs={12} sm={6} md={4} lg={3}>
+                <Controller
+                  render={({ field: { value, onChange } }) => (
+                    <FormControl sx={{ width: "100%" }}>
+                      <InputLabel
+                        id="growth-rate-select-label"
+                        error={eggGroupError !== undefined}
+                      >
+                        Growth Rate
+                      </InputLabel>
+                      <Select
+                        value={value || ""}
+                        onChange={(e) => {
+                          onChange(e);
+                        }}
+                        labelId="growth-rate-select-label"
+                        input={<OutlinedInput label="Growth Rate" />}
+                        variant="outlined"
+                        fullWidth
+                        error={errors.growth_rate !== undefined}
+                        renderValue={(growth_rate) => (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 0.5,
+                            }}
+                          >
+                            <Chip color="secondary" label={growth_rate} />
+                          </Box>
+                        )}
+                      >
+                        {growthRates.map((rate) => (
+                          <MenuItem key={rate.value} value={rate.value}>
+                            {rate.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.growth_rate && (
+                        <FormHelperText error>
+                          {errors.growth_rate.message}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                  name="growth_rate"
+                  control={control}
+                />
+              </Col>
+              <h5>Attributes</h5>
+              <Col xs={12} sm={6} lg={3} className="d-flex align-items-center">
+                <FormControlLabel
+                  control={
+                    <Controller
+                      name={"is_baby"}
+                      control={control}
+                      render={({ field: props }) => (
+                        <Checkbox
+                          {...props}
+                          checked={!!props.value || false}
+                          onChange={(e) => props.onChange(e.target.checked)}
+                        />
+                      )}
+                    />
+                  }
+                  label={"Baby?"}
+                  labelPlacement="start"
+                />
+              </Col>
+              <Col xs={12} sm={6} lg={3} className="d-flex align-items-center">
+                <FormControlLabel
+                  control={
+                    <Controller
+                      name={"is_cute"}
+                      control={control}
+                      render={({ field: props }) => (
+                        <Checkbox
+                          {...props}
+                          checked={!!props.value || false}
+                          onChange={(e) => props.onChange(e.target.checked)}
+                        />
+                      )}
+                    />
+                  }
+                  label={"Cute?"}
+                  labelPlacement="start"
+                />
+              </Col>
+              <Col xs={12} sm={6} lg={3} className="d-flex align-items-center">
+                <FormControlLabel
+                  control={
+                    <Controller
+                      name={"is_legendary"}
+                      control={control}
+                      render={({ field: props }) => (
+                        <Checkbox
+                          {...props}
+                          checked={!!props.value || false}
+                          onChange={(e) => props.onChange(e.target.checked)}
+                        />
+                      )}
+                    />
+                  }
+                  label={"Legendary?"}
+                  labelPlacement="start"
+                />
+              </Col>
+              <Col xs={12} sm={6} lg={3} className="d-flex align-items-center">
+                <FormControlLabel
+                  control={
+                    <Controller
+                      name={"is_mythical"}
+                      control={control}
+                      render={({ field: props }) => (
+                        <Checkbox
+                          {...props}
+                          checked={!!props.value}
+                          onChange={(e) => props.onChange(e.target.checked)}
+                        />
+                      )}
+                    />
+                  }
+                  label={"Mythical?"}
+                  labelPlacement="start"
                 />
               </Col>
             </Row>

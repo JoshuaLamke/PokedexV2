@@ -274,3 +274,30 @@ export const feetInchesToMeters = (feet: number, inches: number) => {
   const numInches = (feet * 12) + inches;
   return Math.round((numInches * inchesToMetersConversion) * 100) / 100;
 };
+
+export const eggGroups = [
+  { label: "Amorphous", value: "Amorphous" },
+  { label: "Bug", value: "Bug" },
+  { label: "Dragon", value: "Dragon" },
+  { label: "Fairy", value: "Fairy" },
+  { label: "Field", value: "Field" },
+  { label: "Flying", value: "Flying" },
+  { label: "Grass", value: "Grass" },
+  { label: "Human-Like", value: "Human-Like" },
+  { label: "Mineral", value: "Mineral" },
+  { label: "Water 1", value: "Water 1" },
+  { label: "Water 2", value: "Water 2" },
+  { label: "Water 3", value: "Water 3" },
+  { label: "Ditto", value: "Ditto" },
+  { label: "Undiscovered", value: "Undiscovered" },
+];
+
+export const growthRates = [
+  { label: "Very Slow", value: "Very Slow" },
+  { label: "Slow", value: "Slow" },
+  { label: "Medium Slow", value: "Medium Slow" },
+  { label: "Medium", value: "Medium" },
+  { label: "Medium Fast", value: "Medium Fast" },
+  { label: "Fast", value: "Fast" },
+  { label: "Very Fast", value: "Very Fast" },
+];

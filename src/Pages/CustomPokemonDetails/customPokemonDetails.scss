@@ -22,3 +22,7 @@
 #details-header {
   font-size: clamp(1.5em, 1.5em + 4vw, 5em)!important;
 }
+
+.custom-evo-img {
+  width: clamp(20vw, 20em, 90vw)
+}
