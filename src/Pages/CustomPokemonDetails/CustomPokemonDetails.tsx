@@ -231,6 +231,39 @@ const CustomPokemonDetails = () => {
     ));
   };
 
+  const evoNameMap: Record<string, boolean> = {};
+
+  const getChainForward: (
+    name: string | undefined,
+    arr: string[]
+  ) => string[] = (name, arr) => {
+    if (!name || !data[name] || evoNameMap[name]) {
+      return arr;
+    }
+    evoNameMap[name] = true;
+    arr.push("evo-chain-arrow");
+    arr.push(name);
+    return getChainForward(data[name].evolves_to, arr);
+  };
+
+  const getChainBackward: (
+    name: string | undefined,
+    arr: string[]
+  ) => string[] = (name, arr) => {
+    if (!name || !data[name] || evoNameMap[name]) {
+      return arr;
+    }
+    evoNameMap[name] = true;
+    arr.unshift(...[name, "evo-chain-arrow"]);
+    return getChainBackward(data[name].evolves_from, arr);
+  };
+
+  const evoChain = [
+    ...getChainBackward(data[pokemonName].evolves_from, []),
+    pokemonName,
+    ...getChainForward(data[pokemonName].evolves_to, []),
+  ];
+  console.log(evoChain);
   return (
     <Container fluid style={{ maxWidth: "80em" }}>
       <Row>
@@ -350,13 +383,7 @@ const CustomPokemonDetails = () => {
           {data[data[pokemonName].evolves_from || ""] ||
           data[data[pokemonName].evolves_to || ""] ? (
             <>
-              {[
-                data[pokemonName].evolves_from,
-                "evo-chain-arrow",
-                pokemonName,
-                "evo-chain-arrow",
-                data[pokemonName].evolves_to,
-              ].map((name, index, arr) => {
+              {evoChain.map((name, index, arr) => {
                 const pokemon = data[name || ""];
                 if (name === "evo-chain-arrow") {
                   if (index === 1 && !data[arr[0] || ""]) {

@@ -116,16 +116,27 @@ const EditPokemon = () => {
       genus: z.string().trim().min(1).max(15),
       shape: z.string().trim().min(1).max(15),
       color: z.string().trim().min(1).max(15),
-      evolves_from: z.string().trim().optional(),
-      evolves_to: z.string().trim().optional(),
+      evolves_from: z
+        .string()
+        .trim()
+        .min(1)
+        .max(15)
+        .optional()
+        .or(z.literal("")),
+      evolves_to: z.string().trim().min(1).max(15).optional().or(z.literal("")),
       has_gender: z.boolean().optional(),
       has_gender_differences: z.boolean().optional(),
-      female_rate: z.number().optional(),
-      male_rate: z.number().optional(),
+      female_rate: z.coerce
+        .number()
+        .min(0)
+        .max(100)
+        .optional()
+        .or(z.undefined()),
+      male_rate: z.number().min(0).max(100).optional().or(z.undefined()),
       egg_groups: z.array(z.string()).optional(),
-      habitat: z.string().trim().optional(),
-      capture_rate: z.number().optional(),
-      base_happiness: z.number().optional(),
+      habitat: z.string().trim().min(1).max(15).optional().or(z.literal("")),
+      capture_rate: z.number().min(0).max(100).optional().or(z.undefined()),
+      base_happiness: z.number().min(0).max(100).optional().or(z.undefined()),
       growth_rate: z.string().optional(),
       is_baby: z.boolean().optional(),
       is_legendary: z.boolean().optional(),
@@ -138,14 +149,18 @@ const EditPokemon = () => {
     })
     .refine(
       (data) => {
-        if (!data.female_rate && !data.male_rate) {
-          return true;
-        } else if (
-          data.female_rate === undefined ||
-          data.male_rate === undefined
+        const rates = [data.female_rate, data.male_rate];
+        if (
+          rates.every((r) => r === undefined) ||
+          rates.every((r) => r === 0)
         ) {
+          return true;
+        } else if (rates.some((r) => r === undefined)) {
           return false;
         } else {
+          if (!data.female_rate || !data.male_rate) {
+            return true;
+          }
           return data.female_rate + data.male_rate === 100;
         }
       },
@@ -162,7 +177,6 @@ const EditPokemon = () => {
     setValue,
     reset,
     register,
-    watch,
     formState: { errors, isDirty },
   } = useForm<Schema>({
     defaultValues: {
@@ -352,7 +366,7 @@ const EditPokemon = () => {
 
   const typeError = errors.types as FieldError | undefined;
   const eggGroupError = errors.egg_groups as FieldError | undefined;
-  console.log(watch());
+
   return (
     <Container className="d-flex flex-column align-items-center">
       <h1 className="form-header text-center mt-3">Create Pokemon</h1>
@@ -468,7 +482,9 @@ const EditPokemon = () => {
               <h5>Stats</h5>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("hp", { valueAsNumber: true })}
+                  {...register("hp", {
+                    valueAsNumber: true,
+                  })}
                   label="HP"
                   variant="outlined"
                   fullWidth
@@ -479,7 +495,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("atk", { valueAsNumber: true })}
+                  {...register("atk", {
+                    valueAsNumber: true,
+                  })}
                   label="Attack"
                   variant="outlined"
                   fullWidth
@@ -490,7 +508,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("def", { valueAsNumber: true })}
+                  {...register("def", {
+                    valueAsNumber: true,
+                  })}
                   label="Defense"
                   variant="outlined"
                   fullWidth
@@ -501,7 +521,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("sp_atk", { valueAsNumber: true })}
+                  {...register("sp_atk", {
+                    valueAsNumber: true,
+                  })}
                   label="Special Attack"
                   variant="outlined"
                   fullWidth
@@ -512,7 +534,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("sp_def", { valueAsNumber: true })}
+                  {...register("sp_def", {
+                    valueAsNumber: true,
+                  })}
                   label="Special Defense"
                   variant="outlined"
                   fullWidth
@@ -523,7 +547,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("speed", { valueAsNumber: true })}
+                  {...register("speed", {
+                    valueAsNumber: true,
+                  })}
                   label="Speed"
                   variant="outlined"
                   fullWidth
@@ -535,7 +561,9 @@ const EditPokemon = () => {
               <h5>Identifying Info</h5>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("feet", { valueAsNumber: true })}
+                  {...register("feet", {
+                    valueAsNumber: true,
+                  })}
                   label="Height (Feet)"
                   variant="outlined"
                   fullWidth
@@ -546,7 +574,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("inches", { valueAsNumber: true })}
+                  {...register("inches", {
+                    valueAsNumber: true,
+                  })}
                   label="Height (Inches)"
                   variant="outlined"
                   fullWidth
@@ -557,7 +587,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("pounds", { valueAsNumber: true })}
+                  {...register("pounds", {
+                    valueAsNumber: true,
+                  })}
                   label="Weight (Pounds)"
                   variant="outlined"
                   fullWidth
@@ -670,7 +702,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={6}>
                 <TextField
-                  {...register("male_rate", { valueAsNumber: true })}
+                  {...register("male_rate", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Male Gender Rate"
                   variant="outlined"
                   fullWidth
@@ -681,7 +715,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={6}>
                 <TextField
-                  {...register("female_rate", { valueAsNumber: true })}
+                  {...register("female_rate", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Female Gender Rate"
                   variant="outlined"
                   fullWidth
@@ -761,7 +797,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("capture_rate", { valueAsNumber: true })}
+                  {...register("capture_rate", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Capture Rate"
                   variant="outlined"
                   type="number"
@@ -772,7 +810,9 @@ const EditPokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("base_happiness", { valueAsNumber: true })}
+                  {...register("base_happiness", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Base Happiness"
                   variant="outlined"
                   type="number"

@@ -122,16 +122,27 @@ const CreatePokemon = () => {
       color: z.string().trim().min(1).max(15),
       password: z.string().trim().min(8).max(15),
       confirm_password: z.string().trim().min(8).max(15),
-      evolves_from: z.string().trim().optional(),
-      evolves_to: z.string().trim().optional(),
+      evolves_from: z
+        .string()
+        .trim()
+        .min(1)
+        .max(15)
+        .optional()
+        .or(z.literal("")),
+      evolves_to: z.string().trim().min(1).max(15).optional().or(z.literal("")),
       has_gender: z.boolean().optional(),
       has_gender_differences: z.boolean().optional(),
-      female_rate: z.number().optional(),
-      male_rate: z.number().optional(),
+      female_rate: z.coerce
+        .number()
+        .min(0)
+        .max(100)
+        .optional()
+        .or(z.undefined()),
+      male_rate: z.number().min(0).max(100).optional().or(z.undefined()),
       egg_groups: z.array(z.string()).optional(),
-      habitat: z.string().trim().optional(),
-      capture_rate: z.number().optional(),
-      base_happiness: z.number().optional(),
+      habitat: z.string().trim().min(1).max(15).optional().or(z.literal("")),
+      capture_rate: z.number().min(0).max(100).optional().or(z.undefined()),
+      base_happiness: z.number().min(0).max(100).optional().or(z.undefined()),
       growth_rate: z.string().optional(),
       is_baby: z.boolean().optional(),
       is_legendary: z.boolean().optional(),
@@ -145,7 +156,29 @@ const CreatePokemon = () => {
     .refine((data) => data.password === data.confirm_password, {
       message: "Passwords must be the same",
       path: ["confirm_password"],
-    });
+    })
+    .refine(
+      (data) => {
+        const rates = [data.female_rate, data.male_rate];
+        if (
+          rates.every((r) => r === undefined) ||
+          rates.every((r) => r === 0)
+        ) {
+          return true;
+        } else if (rates.some((r) => r === undefined)) {
+          return false;
+        } else {
+          if (!data.female_rate || !data.male_rate) {
+            return true;
+          }
+          return data.female_rate + data.male_rate === 100;
+        }
+      },
+      {
+        message: "Gender rates must add up to 100",
+        path: ["female_rate"],
+      }
+    );
 
   type Schema = z.infer<typeof pokemonSchema>;
   const {
@@ -699,7 +732,9 @@ const CreatePokemon = () => {
               </Col>
               <Col xs={12} sm={6}>
                 <TextField
-                  {...register("male_rate", { valueAsNumber: true })}
+                  {...register("male_rate", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Male Gender Rate"
                   variant="outlined"
                   fullWidth
@@ -710,7 +745,9 @@ const CreatePokemon = () => {
               </Col>
               <Col xs={12} sm={6}>
                 <TextField
-                  {...register("female_rate", { valueAsNumber: true })}
+                  {...register("female_rate", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Female Gender Rate"
                   variant="outlined"
                   fullWidth
@@ -790,7 +827,9 @@ const CreatePokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("capture_rate", { valueAsNumber: true })}
+                  {...register("capture_rate", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Capture Rate"
                   variant="outlined"
                   fullWidth
@@ -801,7 +840,9 @@ const CreatePokemon = () => {
               </Col>
               <Col xs={12} sm={4}>
                 <TextField
-                  {...register("base_happiness", { valueAsNumber: true })}
+                  {...register("base_happiness", {
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
+                  })}
                   label="Base Happiness"
                   variant="outlined"
                   type="number"
