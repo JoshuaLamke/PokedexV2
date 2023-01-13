@@ -473,7 +473,7 @@ const PokemonDetails = () => {
                 <td className="lead pokemon-generic-info-text">
                   {speciesData.genera.filter(
                     (genus) => genus.language.name === "en"
-                  )?.[0].genus || "N/A"}
+                  )?.[0]?.genus || "N/A"}
                 </td>
               </tr>
               <tr>
@@ -485,7 +485,7 @@ const PokemonDetails = () => {
               <tr>
                 <th className="lead pokemon-generic-info-text">Color</th>
                 <td className="lead pokemon-generic-info-text">
-                  {capitalizeWithHyphens(speciesData.color.name)}
+                  {capitalizeWithHyphens(speciesData.color?.name || "N/A")}
                 </td>
               </tr>
             </tbody>
@@ -742,7 +742,7 @@ const PokemonDetails = () => {
                     },
                     {
                       className: "lead",
-                      content: <span>{speciesData.capture_rate}</span>,
+                      content: <span>{speciesData.capture_rate || "N/A"}</span>,
                     },
                   ],
                 },
@@ -770,7 +770,9 @@ const PokemonDetails = () => {
                       className: "lead",
                       content: (
                         <span>
-                          {capitalizeWithHyphens(speciesData.growth_rate.name)}
+                          {capitalizeWithHyphens(
+                            speciesData.growth_rate?.name || "N/A"
+                          )}
                         </span>
                       ),
                     },
