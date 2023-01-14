@@ -10,7 +10,7 @@ export const fetchAllPokemon = async () => {
     image: p.image_url["official-artwork"].front_default,
     name: p.pk
   }));
-  return data;
+  return data.sort((a, b) => a.id - b.id);
 };
 
 export const fetchAllCustomPokemon = async () => {
