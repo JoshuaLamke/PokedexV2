@@ -24,5 +24,9 @@
 }
 
 .custom-evo-img {
-  width: clamp(20vw, 20em, 90vw)
+  width: clamp(20vw, 20em, 90vw);
+  cursor: pointer;
+}
+.custom-evo-img:hover {
+  transform: scale(1.05);
 }
